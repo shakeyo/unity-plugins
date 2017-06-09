@@ -11,6 +11,7 @@ import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import com.UGS.NativePluins.R;
 import com.tencent.mm.sdk.modelbase.BaseResp;
 import com.tencent.mm.sdk.modelmsg.SendAuth;
 import com.tencent.mm.sdk.modelmsg.SendMessageToWX;
@@ -130,6 +131,14 @@ public class WXAuth extends BroadcastReceiver {
 		msg.mediaObject = webObj;
 		msg.description = text;
 		msg.title = title;
+		
+		Bitmap thumb = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.app_icon);
+		if(thumb == null){
+			Log.w(DefineConst.LOG_TAG, "null image");
+		}else{
+			Log.w(DefineConst.LOG_TAG, "share thumb:"+thumb.getRowBytes());
+			msg.thumbData = bmpToByteArray(thumb, true);
+		}
 
 		SendMessageToWX.Req req = new SendMessageToWX.Req();
 		req.transaction = String.valueOf(System.currentTimeMillis());
