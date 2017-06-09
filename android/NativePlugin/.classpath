@@ -10,7 +10,5 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="lib" path="/Users/fungkuo/Workspace/unity-plugins/android/NativePlugin/libs/classes.jar"/>
 	<classpathentry kind="lib" path="/Users/fungkuo/Workspace/unity-plugins/android/NativePlugin/libs/RongIMUnity.jar"/>
-	<classpathentry kind="lib" path="/Users/fungkuo/Workspace/unity-plugins/android/NativePlugin/libs/TencentLocationSDK_v5.0.1_r251203_170116_1729.jar"/>
-	<classpathentry kind="lib" path="/Users/fungkuo/Workspace/unity-plugins/android/NativePlugin/libs/MagicWindowSDK.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
