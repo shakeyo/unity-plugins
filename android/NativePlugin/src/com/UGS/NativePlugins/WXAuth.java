@@ -28,10 +28,14 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -119,6 +123,19 @@ public class WXAuth extends BroadcastReceiver {
 		mWeixinAPI.registerApp(AppID);
 		mWeixinAPI.sendReq(req);
 	}
+	
+	public Bitmap GetAppIcon(){
+		PackageManager mgr = mContext.getApplicationContext().getPackageManager();
+		try {
+			Drawable icon = mgr.getApplicationIcon(mContext.getPackageName());
+			BitmapDrawable bd = (BitmapDrawable)icon;
+			return bd.getBitmap();
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	public void SendShareUrl(String title, String text, String url, int scene) {
 
@@ -132,12 +149,12 @@ public class WXAuth extends BroadcastReceiver {
 		msg.description = text;
 		msg.title = title;
 		
-		Bitmap thumb = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.app_icon);
+		Bitmap thumb = GetAppIcon();
 		if(thumb == null){
 			Log.w(DefineConst.LOG_TAG, "null image");
 		}else{
 			Log.w(DefineConst.LOG_TAG, "share thumb:"+thumb.getRowBytes());
-			msg.thumbData = bmpToByteArray(thumb, true);
+			msg.thumbData = bmpToByteArray(thumb, false);
 		}
 
 		SendMessageToWX.Req req = new SendMessageToWX.Req();
@@ -252,30 +269,18 @@ public class WXAuth extends BroadcastReceiver {
 
 		Log.e(DefineConst.LOG_TAG, "ShareImage. Img:" + img + " Size:" + (file.length() / 1024)+" scene:"+scene);
 
-		if (file.length() >= maxSize) {
-			
-			try {
-				Bitmap bmp = BitmapFactory.decodeFile(img);
-				byte[] bytes = BitmapToByteArray(bmp, maxSize);
-				bmp.recycle();
-
-				FileOutputStream os = new FileOutputStream(file);
-				os.write(bytes);
-				os.close();
-
-				Log.e(DefineConst.LOG_TAG, "Compress Image. New Size:" + (bytes.length / 1024));
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
 		Bitmap toShareBMP = BitmapFactory.decodeFile(img);
 		WXImageObject imgObj = new WXImageObject(toShareBMP);
 		WXMediaMessage msg = new WXMediaMessage();
 		msg.mediaObject = imgObj;
+		
 		Bitmap thumbBmp = Bitmap.createScaledBitmap(toShareBMP, THUMB_SIZE, THUMB_SIZE, true);
-		toShareBMP.recycle();
+		if(thumbBmp.getByteCount()>1024*32){
+			byte[] bytes = BitmapToByteArray(thumbBmp, maxSize);
+			thumbBmp.recycle();
+			thumbBmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+		}
+		
 		msg.thumbData = bmpToByteArray(thumbBmp, true);
 
 		SendMessageToWX.Req req = new SendMessageToWX.Req();
